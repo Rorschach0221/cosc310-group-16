@@ -234,3 +234,55 @@ def test_update_restaurant(isolated_restaurants):
 
     assert saved is not None
     assert saved.name == "Updated Korean BBQ"
+
+def test_unavailable_item_stays_unavailable(isolated_items):
+    client = TestClient(app)
+
+    updated_data = {
+        "name": "Updated Beef Pie",
+        "cuisine": "NORAM",
+        "category": "Main",
+        "price": 1499,
+        "description": "Updated description",
+        "image_url": "https://example.com/beef-pie.jpg",
+        "available": False,
+    }
+
+    response = client.put(
+        "/restaurants/1/menu/R1-beef-pie",
+        json=updated_data,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["available"] is False
+
+    updated_data["price"] = 1599
+    del updated_data["available"]
+
+    response = client.put(
+        "/restaurants/1/menu/R1-beef-pie",
+        json=updated_data,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["price"] == 1599
+    assert response.json()["available"] is False
+
+    saved = ItemRepository().get_by_item_id("R1-beef-pie")
+    assert saved is not None
+    assert saved.available is False
+
+    updated_data["available"] = True
+
+    response = client.put(
+        "/restaurants/1/menu/R1-beef-pie",
+        json=updated_data,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["available"] is True
+
+    saved = ItemRepository().get_by_item_id("R1-beef-pie")
+    assert saved is not None
+    assert saved.available is True
+

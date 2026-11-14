@@ -13,6 +13,7 @@ def create_item(restaurant_id: str, new_item: ItemCreate):
         cuisine=new_item.cuisine,
         category=new_item.category,
         price=new_item.price,
+        available=new_item.available,
         description=new_item.description,
         image_url=new_item.image_url,
     )
@@ -27,6 +28,11 @@ def update_item(restaurant_id: str, item_id: str, updated_item: ItemCreate):
         cuisine=updated_item.cuisine,
         category=updated_item.category,
         price=updated_item.price,
+        available=(
+    updated_item.available
+    if "available" in updated_item.model_fields_set
+    else None
+),
         description=updated_item.description,
         image_url=updated_item.image_url,
     )

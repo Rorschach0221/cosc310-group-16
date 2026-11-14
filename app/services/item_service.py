@@ -47,6 +47,7 @@ class ItemService:
 
     def create_menu_item(self, restaurant_id: int, name: str, cuisine: Cuisine, 
                          category: ItemCategory, price: int, 
+                         available: bool = True,
                          description: str = "Placeholder description", 
                          image_url: HttpUrl = "https://imgur.com/a/LCCoa9Z") -> Item:
         if self.restaurant_repository.get_by_id(restaurant_id) is None:
@@ -69,14 +70,15 @@ class ItemService:
         
         new_item = Item(id=new_item_id, restaurant_id=restaurant_id, name=name, 
                               cuisine=cuisine, category=category, price=price,
-                              description=description, image_url=image_url)
+                              description=description, image_url=image_url, available=available,)
         
         return self.repository.create_item(new_item)
 
     def update_menu_item(self, item_id: str, restaurant_id: int, name: str, cuisine: Cuisine, 
                          category: ItemCategory, price: int, 
+                         available: bool | None = None,
                          description: str = "Placeholder description", 
-                         image_url: HttpUrl = "https://imgur.com/a/LCCoa9Z") -> Item:
+                         image_url: HttpUrl = "https://imgur.com/a/LCCoa9Z") -> Item:        
         item = self.get_menu_item(restaurant_id, item_id)
 
         if price <= 0:
@@ -94,6 +96,7 @@ class ItemService:
             price=price,
             description=description,
             image_url=image_url,
+            available=item.available if available is None else available,
         )
 
         updated_item = self.repository.update_item(new_item)
