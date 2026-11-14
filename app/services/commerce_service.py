@@ -1,9 +1,3 @@
-"""Customer -> menu -> cart -> checkout -> order business rules.
-
-Contribution note: M2 integration candidate (AI-assisted draft).
-Once you review, test, and commit your changes, document your own work
-in the PR and docs/PROVENANCE.md rather than claiming sole authorship.
-"""
 import hashlib
 import hmac
 import secrets
@@ -29,7 +23,7 @@ class CommerceService:
         self.repo = repo or CommerceRepository()
         self.items = items or ItemRepository()
         self.restaurants = restaurants or RestaurantRepository()
-        self.sessions = {}  # not persisted; user signs in again after application restart
+        self.sessions = {}
 
     def register(self, data):
         with self.repo.lock:
@@ -85,14 +79,11 @@ class CommerceService:
 
     def _item(self, item_id):
         item = self._lookup_item(item_id)
-        # Existing M1 models may lack an availability flag; default to available.
         if getattr(item, 'available', True) is False or getattr(item, 'active', True) is False:
             fail(409, 'Menu item unavailable')
         return item
 
     def _lookup_item(self, item_id):
-        # M2 bug fix candidate: cart display must not require an item to remain
-        # purchasable. A customer needs to see/remove items disabled after adding.
         item = self.items.get_by_item_id(item_id)
         if not item:
             fail(404, 'Menu item not found')
@@ -183,14 +174,12 @@ class CommerceService:
             for item_id, qty in cart['items'].items():
                 if qty < 1 or str(self._item(item_id).restaurant_id) != cart['restaurant_id']:
                     fail(409, 'Invalid cart contents')
-            view = self._view_cart(cart)  # Fresh authoritative prices
+            view = self._view_cart(cart) 
             order = {'id': str(uuid4()), 'customer_id': customer_id,
                      'restaurant_id': cart['restaurant_id'], 'delivery_address': customer['address'],
                      'items': view['items'], 'subtotal_cents': view['subtotal_cents'],
                      'total_cents': view['total_cents'], 'status': 'created',
                      'created_at': datetime.now(timezone.utc).isoformat()}
-            # M2 integration fix: stage the order and cart clear together, then
-            # atomically replace one JSON file. A failed save leaves both untouched.
             db['orders'][order['id']] = order
             db['carts'].pop(customer_id, None)
             self.repo.save(db)

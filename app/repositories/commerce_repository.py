@@ -1,4 +1,3 @@
-"""Isolated JSON persistence for customer, cart and order records."""
 import json
 import os
 import tempfile

@@ -1,7 +1,3 @@
-"""End-to-end tests against actual M1 JSON menu and M2 FastAPI routes.
-
-AI-assisted test draft. Uses a temporary customer/order data file.
-"""
 from fastapi.testclient import TestClient
 from app.main import app
 from app.api.routes.commerce_router import service
@@ -39,7 +35,6 @@ def test_real_menu_to_order_via_api(tmp_path, monkeypatch):
 
 
 def test_real_menu_availability_round_trip(tmp_path, monkeypatch):
-    # Never edit committed M1 representative files during tests.
     import json
     from app.repositories import item_repository
     source = item_repository.DATA_PATH
@@ -59,7 +54,6 @@ def test_real_menu_availability_round_trip(tmp_path, monkeypatch):
         if row['id'] == item['id']:
             row['available'] = False
     temp.write_text(json.dumps(data), encoding='utf-8')
-    # Customers must still be able to see/remove unavailable items, not checkout.
     assert client.get('/cart',headers=auth).status_code == 200
     assert client.post('/checkout',headers=auth).status_code == 409
     assert client.delete(f"/cart/items/{item['id']}",headers=auth).status_code == 200

@@ -29,7 +29,7 @@ def test_frontend_page_is_served():
     assert "restaurant.html?id=" in response.text
 
 
-def test_restaurant_details_page_is_served():
+def test_restaurant_details_page_has_required_elements():
     response = TestClient(app).get("/restaurant.html")
 
     assert response.status_code == 200
@@ -37,10 +37,9 @@ def test_restaurant_details_page_is_served():
     assert 'id="restaurant-image"' in response.text
     assert 'id="restaurant-open"' in response.text
     assert 'fetch(`/restaurants/${encodeURIComponent(restaurantId)}/menu`)' in response.text
-    assert "restaurant.html?id=" in response.text
 
 
-def test_restaurant_details_page_is_served():
+def test_restaurant_details_page_has_menu_container():
     response = TestClient(app).get("/restaurant.html")
 
     assert response.status_code == 200

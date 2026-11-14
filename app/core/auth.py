@@ -1,4 +1,4 @@
-# M2 improvement: check the user's role before allowing restaurant changes.
+# This is to check the user's role before allowing restaurant changes.
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 

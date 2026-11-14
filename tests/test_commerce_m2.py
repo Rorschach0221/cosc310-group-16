@@ -1,4 +1,3 @@
-"""Run from repository root with: python -m pytest tests/test_commerce_m2.py -v"""
 from types import SimpleNamespace
 import pytest
 from fastapi import HTTPException
@@ -41,7 +40,6 @@ def test_integrated_customer_to_order_and_restart(setup):
     svc.add(uid, 'a', 2)
     svc.add(uid, 'b', 1)
     assert svc.cart(uid)['total_cents'] == 3100
-    # Current price must be authoritative during checkout
     items.values['a'].price = 1300
     order = svc.checkout(uid)
     assert order['total_cents'] == 3300
@@ -99,8 +97,6 @@ def test_order_isolation(setup):
 
 
 def test_unavailable_item_remains_visible_and_removable(setup):
-    # Regression test candidate: previously GET /cart failed with 409 as soon
-    # as a menu item became unavailable, trapping it in the customer's cart.
     svc, repo, items, uid = setup
     svc.add(uid, 'a', 1)
     items.values['a'].available = False
