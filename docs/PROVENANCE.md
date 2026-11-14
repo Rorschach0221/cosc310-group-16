@@ -84,3 +84,13 @@ You normally do not need to record situations like:
 - Influence: Identify syntax, indentation, and undefined variable errors.
 - Validation: All 18 tests passed with 1 warning.
 - PR: Pending
+
+### Entry 7
+- Student(s): Liu Shuai
+- Artifact: web/m2.html
+- Label: Non-AI
+- AI tool: NA
+- Purpose: Implement a Quick Test Login feature to reduce repetitive manual input during frontend testing.
+- Influence: I identified the need for a faster testing workflow. I googled for necessary JavaScript code suggestions for automatically filling test customer details and calling the existing login function. I integrated the feature into the webpage and corrected the HTML comment syntax.
+- Validation: Tested the shortcut locally and confirmed that the test account could successfully sign in through the existing authentication process.
+- PR: Pending

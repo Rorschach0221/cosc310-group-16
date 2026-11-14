@@ -1,3 +1,4 @@
+Item 1
 Menu Item Availability and State Preservation 14th Nov, 2026
 Feature Integration
 
@@ -24,4 +25,31 @@ Latest pytest result: 18 passed, 1 warning, 0 failed.
 
 AI Assistance:
 Used ChatGPT for correcting syntax error.
+
+Item 2
+Testing Efficiency 14th Nov, 2026
+Developer Experience
+
+Problem:
+When testing the customer registration, shopping cart, and checkout features, I found that after every page refresh or debug frontend changes, it is very troublesome to enter(or copy and paste) login credentials.
+
+Improvement:
+I added a Quick Test Login button to web/m2.html to automatically fill in predefined test customer information and sign in through the existing login function.
+This allows me to access the application more quickly during repeated manual testing without changing the backend authentication process.
+I also corrected the HTML comment syntax to keep development notes (for my teammates to delete after we done all the testing in the future) in the source code without displaying them on the webpage.
+
+Testing:
+Firstly I Verified that the test customer could successfully sign in using the shortcut. Secondly, IConfirmed that the login status displayed "Signed in". Lastly, I Confirmed that the shortcut uses the existing authentication flow.
+
+Reflection:
+Although this is a small feature, I wanted to improve the development workflow, increase efficiency. So that we don't need to repeatedly performing the same manual steps. This makes future testing of the cart, checkout, and order features more convenient.
+The shortcut is intended for local development only. In the future, it will be removed or replaced before the final public submission.
+
+AI Assistance:
+I googled necessary code to implement this small function. No AI assisted
+
+GitHub Evidence:
+File: web/m2.html
+Commit: Pending
+PR: Pending
 
