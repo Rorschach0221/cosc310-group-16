@@ -283,3 +283,21 @@ def test_unavailable_item_stays_unavailable(isolated_items, admin_client):
     assert saved is not None
     assert saved.available is True
 
+def test_menu_item_price_must_be_positive():
+    from pydantic import ValidationError
+    from app.schemas.item import ItemCreate
+
+    valid_data = {
+        "name": "Test Dish",
+        "cuisine": "ASIAN",
+        "category": "Main",
+        "price": 1200,
+    }
+
+    item = ItemCreate(**valid_data)
+    assert item.price == 1200
+
+    for invalid_price in (0, -100):
+        with pytest.raises(ValidationError):
+            ItemCreate(**{**valid_data, "price": invalid_price})
+

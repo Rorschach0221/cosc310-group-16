@@ -96,13 +96,23 @@ def test_order_isolation(setup):
     expect_status(403, lambda: svc.get_order(other, order['id']))
 
 
+
 def test_unavailable_item_remains_visible_and_removable(setup):
     svc, repo, items, uid = setup
+
     svc.add(uid, 'a', 1)
     items.values['a'].available = False
-    assert svc.cart(uid)['items'][0]['item_id'] == 'a'
+
     expect_status(409, lambda: svc.checkout(uid))
+
+    saved = repo.read()
+
+    assert saved['carts'][uid]['items']['a'] == 1
+    assert saved['orders'] == {}
+
+    assert svc.cart(uid)['items'][0]['item_id'] == 'a'
     assert svc.remove(uid, 'a')['items'] == []
+
 
 
 def test_unavailable_item_cannot_be_added_to_new_cart(setup):
@@ -318,3 +328,47 @@ def test_missing_items_and_orders_rejected(setup):
 
     assert svc.cart(uid)['items'] == []
     assert svc.list_orders(uid) == []
+
+def test_checkout_rejects_invalid_saved_quantity(setup):
+    svc, repo, items, uid = setup
+
+    svc.add(uid, 'a', 2)
+
+    db = repo.read()
+    db['carts'][uid]['items']['a'] = 0
+    repo.save(db)
+
+    expect_status(409, lambda: svc.checkout(uid))
+
+    saved = repo.read()
+    assert saved['carts'][uid]['items']['a'] == 0
+    assert saved['orders'] == {}
+
+def test_checkout_rejects_item_restaurant_mismatch(setup):
+    svc, repo, items, uid = setup
+
+    svc.add(uid, 'a', 2)
+
+    items.values['a'].restaurant_id = 2
+
+    expect_status(409, lambda: svc.checkout(uid))
+
+    saved = repo.read()
+    assert saved['carts'][uid]['restaurant_id'] == '1'
+    assert saved['carts'][uid]['items']['a'] == 2
+    assert saved['orders'] == {}
+
+def test_checkout_rejects_missing_delivery_address(setup):
+    svc, repo, items, uid = setup
+
+    svc.add(uid, 'a', 2)
+
+    db = repo.read()
+    db['customers'][uid]['address'] = ''
+    repo.save(db)
+
+    expect_status(409, lambda: svc.checkout(uid))
+
+    saved = repo.read()
+    assert saved['carts'][uid]['items']['a'] == 2
+    assert saved['orders'] == {}

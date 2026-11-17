@@ -1,5 +1,5 @@
 Item 1
-Menu Item Availability and State Preservation 14th Nov, 2026
+Menu Item Availability and State Preservation 
 Feature Integration
 
 Problem:
@@ -27,7 +27,7 @@ AI Assistance:
 Used ChatGPT for correcting syntax error.
 
 Item 2
-Testing Efficiency 14th Nov, 2026
+Testing Efficiency 
 Developer Experience
 
 Problem:
@@ -55,7 +55,6 @@ PR: Pending
 
 Item 3
 Improving JSON Data Persistence  
-16th Nov, 2026  
 Architecture Improvement and Decision Receipt
 
 Problem:
@@ -78,7 +77,7 @@ Reflection:
 This change helped make the data storage more reliable. It also reduced repeated file-saving code between repositories. I think it was a useful improvement because the M2 system depends on keeping customer orders and menu data consistent.
 
 AI Assistance:
-I used ChatGPT for implementation suggestions and debugging. I integrated the changes and verified the results.
+I used Gemini for implementation suggestions and debugging. I integrated the changes and verified the results.
 
 GitHub Evidence:
 Files: app/repositories/json_storage.py, app/repositories/item_repository.py, app/repositories/restaurant_repository.py, tests/test_json_storage.py  
@@ -86,7 +85,6 @@ PR: Pending
 
 Item 4
 Customer, Cart, and Checkout Integration
-16th Nov, 2026
 Feature Integration
 
 Problem:
@@ -115,7 +113,6 @@ PR: Pending
 
 Item 5
 Role-Based Access Control
-16th Nov, 2026
 Security Improvement / Decision Receipt
 
 Problem:
@@ -140,7 +137,7 @@ Reflection:
 This improvement helped make the system more secure and made the API behaviour easier to understand.
 
 AI Assistance:
-I used ChatGPT for implementation suggestions and test guidance.
+I used Grok for implementation suggestions and test guidance.
 
 GitHub Evidence:
 Files: app/core/auth.py, app/api/routes/restaurant_router.py, app/api/routes/item_router.py, tests/test_admin_auth.py, tests/test_m2_api_integration.py

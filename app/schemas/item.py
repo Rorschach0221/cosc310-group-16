@@ -8,7 +8,8 @@ class Item(BaseModel):
     name: str = Field(..., description="Display name of the item", examples=["Beef Pie", "Shawarma"])
     cuisine: Cuisine = Field(..., description="The cuisine group that best fits this item")
     category: ItemCategory = Field(..., description="The food category that best fits this item")
-    price: int = Field(..., ge=0, description="Price in cents", examples=[1499])
+    price: int = Field(..., gt=0, description="Price in cents", examples=[1499])
+
     available: bool = Field(
     default=True,
     description="Whether customers can currently purchase the item"
@@ -20,7 +21,8 @@ class ItemCreate(BaseModel):
     name: str
     cuisine: Cuisine
     category: ItemCategory
-    price: int = Field(ge=0)
+    price: int = Field(gt=0)
+
     available: bool = True
     description: str = Field(default="Placeholder description")
     image_url: HttpUrl = Field(default="https://imgur.com/a/LCCoa9Z")

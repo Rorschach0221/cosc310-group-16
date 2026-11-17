@@ -24,7 +24,25 @@ let token='';const $=id=>document.getElementById(id);
 async function api(path, method='GET', data){const r=await fetch(path,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},...(data?{body:JSON.stringify(data)}:{})});const j=r.status===204?{}:await r.json();if(!r.ok)throw Error(JSON.stringify(j));return j}
 async function go(fn){try{$('status').textContent=JSON.stringify(await fn(),null,2)}catch(e){$('status').textContent=e.message}}
 async function register(){await go(()=>api('/customers/register','POST',{name:$('name').value,email:$('email').value,password:$('password').value,address:$('address').value}))}
-async function login(){await go(async()=>{const v=await api('/customers/login','POST',{email:$('email').value,password:$('password').value});token=v.access_token;return 'Signed in'})}
+
+
+async function login() {
+    token = '';
+    $('cart').replaceChildren();
+    $('orders').replaceChildren();
+
+    await go(async () => {
+        const result = await api('/customers/login', 'POST', {
+            email: $('email').value,
+            password: $('password').value
+        });
+
+        token = result.access_token;
+        return 'Signed in';
+    });
+}
+
+
 
 //quick login function.
 async function quickTestLogin() {
@@ -92,7 +110,6 @@ function showCart(c) {
 
         row.appendChild(name);
 
-        //increase the quantity of the selected cart item.
         const plus = document.createElement('button');
         plus.textContent = '+';
         plus.onclick = () => updateQuantity(
@@ -100,7 +117,6 @@ function showCart(c) {
             item.quantity + 1
         );
 
-        //decrease quantity, or remove the item when it reaches zero.
         const minus = document.createElement('button');
         minus.textContent = '−';
         minus.onclick = () => {
@@ -163,6 +179,35 @@ async function clearCart() {
 }
 
 async function cart(){await go(async()=>{const x=await api('/cart');showCart(x);return x})}
-async function checkout(){await go(async()=>{const x=await api('/checkout','POST');await cart();await orders();return x})}
+
+
+async function checkout() {
+  let order;
+
+  try {
+    order = await api('/checkout', 'POST');
+  } catch (error) {
+    $('status').textContent = `Checkout failed: ${error.message}`;
+    return;
+  }
+
+  $('status').textContent =
+    `Order created successfully.\nOrder ID: ${order.id}`;
+
+  try {
+    const updatedCart = await api('/cart');
+    showCart(updatedCart);
+
+    const updatedOrders = await api('/orders');
+    $('orders').textContent = updatedOrders
+      .map(o => `${o.id}: $${(o.total_cents / 100).toFixed(2)} (${o.status})`)
+      .join('\n');
+  } catch (refreshError) {
+    $('status').textContent +=
+      `\nOrder saved, but page refresh failed: ${refreshError.message}`;
+  }
+}
+
+
 async function orders(){await go(async()=>{const x=await api('/orders');$('orders').textContent=x.map(o=>`${o.id}: $${(o.total_cents/100).toFixed(2)} (${o.status})`).join('\n');return x})}
 </script></body></html>
