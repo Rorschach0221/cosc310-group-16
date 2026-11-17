@@ -141,6 +141,6 @@ You normally do not need to record situations like:
 - Label: AI-ASSISTED
 - AI tool: Claude
 - Purpose: Connect the restaurant browsing page to the M2 ordering interface and improve frontend authentication and checkout feedback.
-- Influence: I wrote the frontend JS to link the pages and handle the UI feedback. I asked ChatGPT to review my DOM manipulation code and check for any syntax errors. During my own testing, I caught a bug where old login data wasn't clearing, and Claude helped me verify the fix was robust.
+- Influence: I wrote the frontend JS to link the pages and handle the UI feedback. I asked Claude to review my DOM manipulation code and check for any syntax errors. During my own testing, I caught a bug where old login data wasn't clearing, and Claude helped me verify the fix was robust.
 - Validation: Checked for JS syntax errors using Node.js, then tested manually in the browser. Went through login failures, successful checkout, and page refreshes to make sure the UI updated correctly. Python tests still passing (64).
 - PR: Pending
