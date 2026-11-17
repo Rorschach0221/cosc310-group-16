@@ -53,3 +53,95 @@ File: web/m2.html
 Commit: Pending
 PR: Pending
 
+Item 3
+Improving JSON Data Persistence  
+16th Nov, 2026  
+Architecture Improvement and Decision Receipt
+
+Problem:
+During M2 integration, I noticed that the restaurant and menu repositories were saving data directly to JSON files. If something went wrong during saving, the original file could potentially be damaged.
+
+Implementation:
+I have two ideas:
+1 Keep the existing file-writing method because it was simple and already working.
+2 Use a temporary file and replace the original file after the new data was written successfully.
+I chose the second option because it provided better protection for our stored data without making major changes to the existing project.
+I added app/repositories/json_storage.py and updated the restaurant and item repositories to use the shared JSON saving function.
+The function writes data to a temporary file first, then replaces the original file. This reduces the risk of leaving a partially written JSON file if saving fails.
+I also added tests to check that JSON files could be created, updated, and preserved when replacement failed.
+
+Testing:
+I ran the repository tests and the full automated test suite. All 60 tests passed, and the overall Python code coverage reached 97%.
+I also confirmed that the GitHub Actions test workflow completed successfully.
+
+Reflection:
+This change helped make the data storage more reliable. It also reduced repeated file-saving code between repositories. I think it was a useful improvement because the M2 system depends on keeping customer orders and menu data consistent.
+
+AI Assistance:
+I used ChatGPT for implementation suggestions and debugging. I integrated the changes and verified the results.
+
+GitHub Evidence:
+Files: app/repositories/json_storage.py, app/repositories/item_repository.py, app/repositories/restaurant_repository.py, tests/test_json_storage.py  
+PR: Pending
+
+Item 4
+Customer, Cart, and Checkout Integration
+16th Nov, 2026
+Feature Integration
+
+Problem:
+M2 required the customer, restaurant, menu, cart, and order features to work together. It was important to make sure the system could complete an order rather than having separate features that only worked individually.
+
+Implementation:
+I worked on integrating the customer registration and login process with the shopping cart and checkout system.
+The cart supports adding items, changing quantities, removing items, and clearing the cart. I also checked that customers could only add items from one restaurant at a time.
+During checkout, the system checks the customer information, restaurant status, and menu item availability before creating an order.
+After checkout, the order is saved and the customer's cart is cleared.
+
+Testing and Validation:
+I tested the complete workflow through the frontend, starting from registration and login.
+I added a menu item to the cart, changed its quantity, completed checkout, and checked the saved order.
+I also restarted the application and confirmed that the previous order could still be retrieved.
+
+Reflection:
+This was an important part of M2 because it connected several features into one working system. Testing the full process helped me understand how the different parts of the backend interact.
+
+AI Assistance:
+I used ChatGPT for implementation examples and debugging.
+
+GitHub Evidence:
+Files: app/services/commerce_service.py, app/api/routes/commerce_router.py, app/schemas/commerce.py
+PR: Pending
+
+Item 5
+Role-Based Access Control
+16th Nov, 2026
+Security Improvement / Decision Receipt
+
+Problem:
+The system has different types of users. Regular customers should be able to browse restaurants and place orders, but they should not be able to create or modify restaurant and menu information.
+
+Options Considered:
+Allow all authenticated users to access the existing management endpoints.
+Restrict restaurant and menu modifications to users with the admin role.
+I chose the second approach because it provides a clear separation between customers and administrators.
+
+Implementation:
+I worked on integrating authentication and role checks into the API.
+Requests without a valid login token are rejected. Customers who are logged in but do not have administrator permissions cannot access the restaurant and menu modification endpoints.
+The system also uses different HTTP status codes for authentication and permission errors.
+
+Testing and Validation:
+I tested unauthenticated requests and requests made using a regular customer account.
+I verified that unauthenticated requests returned 401 and regular customers received 403 when accessing protected management endpoints.
+I also added checks to confirm that rejected requests did not modify the restaurant or menu JSON files.
+
+Reflection:
+This improvement helped make the system more secure and made the API behaviour easier to understand.
+
+AI Assistance:
+I used ChatGPT for implementation suggestions and test guidance.
+
+GitHub Evidence:
+Files: app/core/auth.py, app/api/routes/restaurant_router.py, app/api/routes/item_router.py, tests/test_admin_auth.py, tests/test_m2_api_integration.py
+PR: Pending
