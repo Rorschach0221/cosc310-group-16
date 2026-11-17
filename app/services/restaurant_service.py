@@ -9,21 +9,24 @@ class RestaurantService:
     def get_all_restaurants(self) -> list[Restaurant]:
         restaurants = self.repository.get_all_restaurants()
         if restaurants:
-            return restaurants 
+            return restaurants
         raise HTTPException(status_code=404, detail="No restaurants found")
-    
+
     def get_restaurant_by_id(self, restaurant_id: str) -> Restaurant:
         restaurant = self.repository.get_by_id(restaurant_id)
         if restaurant:
-            return restaurant 
+            return restaurant
         raise HTTPException(status_code=404, detail=f"Restaurant ID: {restaurant_id} not found")
+
     def search_restaurants(self, search: str | None = None, cuisine: str | None = None) -> list[Restaurant]:
-        restaurants = self.repository.get_all_restaurants() or []
+        restaurants = self.repository.get_all_restaurants()
 
         if search:
+            keyword = search.strip().lower()
             restaurants = [
                 restaurant for restaurant in restaurants
-                if search.lower() in restaurant.name.lower()
+                if keyword in restaurant.name.lower()
+                or keyword in restaurant.description.lower()
             ]
 
         if cuisine:
@@ -33,6 +36,7 @@ class RestaurantService:
             ]
 
         return restaurants
+
 
     def create_restaurant(self, restaurant_data: RestaurantCreate) -> Restaurant:
         return self.repository.create_restaurant(restaurant_data)

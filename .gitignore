@@ -7,3 +7,5 @@ data/test_*.json
 .DS_Store
 .vscode/
 data/commerce.json
+.coverage
+htmlcov/

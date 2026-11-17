@@ -138,6 +138,8 @@ class CommerceService:
             cart = db['carts'].get(customer_id)
             if not cart or item_id not in cart['items']:
                 fail(404, 'Item not in cart')
+            item = self._item(item_id)
+            self._restaurant(item.restaurant_id)
             cart['items'][item_id] = quantity
             self.repo.save(db)
             return self._view_cart(cart)

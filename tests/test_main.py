@@ -171,6 +171,14 @@ def test_restaurant_search(isolated_restaurants):
     assert len(response.json()) == 1
     assert response.json()[0]["name"] == "Asian Restaurant"
 
+def test_restaurant_search_no_match(isolated_restaurants):
+    response = TestClient(app).get(
+        "/restaurants",
+        params={"search": "restaurant-that-does-not-exist-xyz"}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == []
 
 
 def test_restaurant_cuisine_filter(isolated_restaurants):
@@ -202,6 +210,7 @@ def test_create_restaurant(isolated_restaurants, admin_client):
     assert saved is not None
     assert saved.name == "Korean BBQ"
 
+
 def test_update_restaurant(isolated_restaurants, admin_client):
     updated_data = {
         "name": "Updated Korean BBQ",
@@ -213,18 +222,6 @@ def test_update_restaurant(isolated_restaurants, admin_client):
     }
 
     response = admin_client.put("/restaurants/1", json=updated_data)
-
-    assert response.status_code == 200
-    assert response.json()["id"] == "1"
-    assert response.json()["name"] == "Updated Korean BBQ"
-
-    saved = RestaurantRepository().get_by_id("1")
-
-    assert saved is not None
-    assert saved.name == "Updated Korean BBQ"
-
-
-    response = TestClient(app).put("/restaurants/1", json=updated_data)
 
     assert response.status_code == 200
     assert response.json()["id"] == "1"

@@ -307,6 +307,72 @@ def test_real_admin_token_can_create_restaurant(
     assert update_response.json()["price"] == 1599
 
 
+def test_customer_cannot_update_restaurant_or_menu(tmp_path, monkeypatch):
+    from app.api.routes import commerce_router
+    from app.repositories.commerce_repository import CommerceRepository
+    from app.services.commerce_service import CommerceService
+
+    test_service = CommerceService(
+        repo=CommerceRepository(tmp_path / "commerce.json")
+    )
+    monkeypatch.setattr(commerce_router, "service", test_service)
+
+    client = TestClient(app)
+
+    customer = {
+        "name": "Permission Test",
+        "email": "update-permission@example.com",
+        "password": "TestPassword123!",
+        "address": "123 Test Street",
+    }
+
+    registered = client.post("/customers/register", json=customer)
+    assert registered.status_code == 201
+
+    login = client.post(
+        "/customers/login",
+        json={
+            "email": customer["email"],
+            "password": customer["password"],
+        },
+    )
+    assert login.status_code == 200
+
+    token = login.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    restaurant_update = {
+        "name": "Unauthorized Update",
+        "cuisine": "ASIAN",
+        "description": "Should not be saved",
+        "image_url": "https://example.com/test.jpg",
+        "is_open": True,
+        "rating": 4.5,
+    }
+
+    response = client.put(
+        "/restaurants/1",
+        json=restaurant_update,
+        headers=headers,
+    )
+    assert response.status_code == 403
+
+    item_update = {
+        "name": "Unauthorized Item Update",
+        "cuisine": "NORAM",
+        "category": "Main",
+        "price": 999,
+        "description": "Should not be saved",
+        "image_url": "https://example.com/item.jpg",
+    }
+
+    response = client.put(
+        "/restaurants/1/menu/R1-beef-pie",
+        json=item_update,
+        headers=headers,
+    )
+    assert response.status_code == 403
+
 
 
 

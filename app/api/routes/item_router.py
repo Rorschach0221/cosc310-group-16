@@ -5,12 +5,19 @@ from app.core.auth import require_admin
 
 router = APIRouter(prefix="/restaurants", tags=["items"])
 
-
 @router.post(
     "/{restaurant_id}/menu",
     response_model=Item,
     status_code=201,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
+    summary="Create a menu item",
+    responses={
+        401: {"description": "Authentication required or invalid token"},
+        403: {"description": "Admin access required"},
+        404: {"description": "Restaurant not found"},
+        409: {"description": "Menu item already exists"},
+        422: {"description": "Invalid menu item data or price"}
+    }
 )
 
 def create_item(restaurant_id: str, new_item: ItemCreate):
@@ -25,12 +32,19 @@ def create_item(restaurant_id: str, new_item: ItemCreate):
         image_url=new_item.image_url,
     )
 
-
 @router.put(
     "/{restaurant_id}/menu/{item_id}",
     response_model=Item,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
+    summary="Update a menu item",
+    responses={
+        401: {"description": "Authentication required or invalid token"},
+        403: {"description": "Admin access required"},
+        404: {"description": "Restaurant or menu item not found"},
+        422: {"description": "Invalid menu item data or price"}
+    }
 )
+
 
 def update_item(restaurant_id: str, item_id: str, updated_item: ItemCreate):
     return ItemService().update_menu_item(

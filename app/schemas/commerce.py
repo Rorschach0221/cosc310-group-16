@@ -20,3 +20,43 @@ class CartAdd(BaseModel):
 
 class QuantityUpdate(BaseModel):
     quantity: int = Field(gt=0)
+
+class CustomerResponse(BaseModel):
+    id: str
+    email: str
+    name: str
+    address: str
+    active: bool
+    role: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class CartItemResponse(BaseModel):
+    item_id: str
+    name: str
+    quantity: int
+    unit_price_cents: int
+    line_total_cents: int
+
+
+class CartResponse(BaseModel):
+    restaurant_id: str | None
+    items: list[CartItemResponse]
+    subtotal_cents: int
+    total_cents: int
+
+
+class OrderResponse(BaseModel):
+    id: str
+    customer_id: str
+    restaurant_id: str
+    delivery_address: str
+    items: list[CartItemResponse]
+    subtotal_cents: int
+    total_cents: int
+    status: str
+    created_at: str

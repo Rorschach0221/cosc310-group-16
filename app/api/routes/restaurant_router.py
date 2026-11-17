@@ -8,26 +8,51 @@ from app.core.auth import require_admin
 
 router = APIRouter(prefix="/restaurants", tags=["restaurants"])
 
+@router.get(
+    "",
+    response_model=list[Restaurant],
+    summary="List and search restaurants",
+    responses={
+        404: {"description": "No restaurants found"}
+    }
+)
 
-@router.get("", response_model=list[Restaurant])
 def get_all_restaurants(search: str | None = None, cuisine: str | None = None):
     if search is not None or cuisine is not None:
         return RestaurantService().search_restaurants(search, cuisine)
 
     return RestaurantService().get_all_restaurants()
 
+@router.get(
+    "/{restaurant_id}",
+    response_model=Restaurant,
+    summary="Get restaurant details",
+    responses={
+        404: {"description": "Restaurant not found"}
+    }
+)
 
-@router.get("/{restaurant_id}", response_model=Restaurant)
 def get_restaurant(restaurant_id: str):
     return RestaurantService().get_restaurant_by_id(restaurant_id)
 
 
-@router.get("/{restaurant_id}/menu", response_model=list[Item])
+@router.get(
+    "/{restaurant_id}/menu",
+    response_model=list[Item],
+    summary="Get restaurant menu",
+    responses={
+        404: {"description": "Restaurant not found"}
+    }
+)
+
 def get_restaurant_menu(restaurant_id: str):
     return ItemService().get_restaurant_menu(restaurant_id)
 
-
-@router.get("/{restaurant_id}/menu/{item_id}", response_model=Item)
+@router.get(
+    "/{restaurant_id}/menu/{item_id}",
+    response_model=Item,
+    responses={404: {"description": "Restaurant or menu item not found"}}
+)
 def get_menu_item(restaurant_id: str, item_id: str):
     return ItemService().get_menu_item(restaurant_id, item_id)
 
@@ -36,8 +61,14 @@ def get_menu_item(restaurant_id: str, item_id: str):
     "",
     response_model=Restaurant,
     status_code=201,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
+    summary="Create a restaurant",
+    responses={
+        401: {"description": "Authentication required or invalid token"},
+        403: {"description": "Admin access required"},
+    }
 )
+
 
 def create_restaurant(restaurant_data: RestaurantCreate):
     return RestaurantService().create_restaurant(restaurant_data)
@@ -46,8 +77,15 @@ def create_restaurant(restaurant_data: RestaurantCreate):
 @router.put(
     "/{restaurant_id}",
     response_model=Restaurant,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
+    summary="Update restaurant details",
+    responses={
+        401: {"description": "Authentication required or invalid token"},
+        403: {"description": "Admin access required"},
+        404: {"description": "Restaurant not found"},
+    }
 )
+
 
 def update_restaurant(restaurant_id: str, restaurant_data: RestaurantCreate):
     return RestaurantService().update_restaurant(restaurant_id, restaurant_data)

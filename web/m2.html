@@ -9,6 +9,12 @@
     <button onclick="quickTestLogin()">Quick Test Login</button>
     <!--quick login ends here. I will remove this when necessary.-->
 
+<div>
+    <button onclick="myProfile()">My Profile</button>
+    <button onclick="updateProfile()">Update Profile</button>
+    <button onclick="deactivateAccount()">Deactivate Account</button>
+</div>
+
 </fieldset>
 <fieldset><legend>2. Restaurants / Menu</legend><button onclick="restaurants()">Browse restaurants</button><select id="restaurants" onchange="menu()"><option value="">Select restaurant</option></select><div id="menu"></div></fieldset>
 <fieldset><legend>3. Cart / Checkout</legend><button onclick="cart()">Refresh cart</button><button onclick="clearCart()">Clear cart</button><button onclick="checkout()">Checkout</button><div id="cart"></div></fieldset>
@@ -30,6 +36,46 @@ async function quickTestLogin() {
     await login();
 }
 //quick login function ends here.
+
+async function myProfile() {
+    await go(async () => {
+        const profile = await api('/customers/me');
+
+        $('name').value = profile.name;
+        $('email').value = profile.email;
+        $('address').value = profile.address;
+
+        return profile;
+    });
+}
+
+async function updateProfile() {
+    await go(async () => {
+        const updated = await api('/customers/me', 'PATCH', {
+            name: $('name').value,
+            address: $('address').value
+        });
+
+        return updated;
+    });
+}
+
+async function deactivateAccount() {
+    if (!confirm('Are you sure you want to deactivate your account?')) {
+        return;
+    }
+
+    await go(async () => {
+        await api('/customers/me', 'DELETE');
+
+        token = '';
+        $('password').value = '';
+        $('cart').replaceChildren();
+        $('orders').replaceChildren();
+
+        return 'Account deactivated successfully';
+    });
+}
 
 async function restaurants(){await go(async()=>{const r=await api('/restaurants');$('restaurants').innerHTML='<option value="">Select restaurant</option>'+r.map(x=>`<option value="${x.id}">${x.name.replaceAll('<','&lt;')}</option>`).join('');return r})}
 async function menu(){const id=$('restaurants').value;if(!id)return;await go(async()=>{const items=await api(`/restaurants/${encodeURIComponent(id)}/menu`);$('menu').replaceChildren(...items.map(x=>{const div=document.createElement('div');const b=document.createElement('button');b.textContent=`Add ${x.name} — $${(x.price/100).toFixed(2)}`;b.onclick=()=>go(async()=>{const r=await api('/cart/items','POST',{item_id:x.id,quantity:1});showCart(r);return r});div.append(b);return div}));return items})}
